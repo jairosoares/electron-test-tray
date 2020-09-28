@@ -1,10 +1,8 @@
 const { resolve} = require('path')
-const { app, Menu, Tray, systemPreferences, nativeTheme } = require('electron');
+const { app, Menu, Tray, systemPreferences, nativeTheme, clipboard } = require('electron');
 const { get } = require('http');
 
 const clippings = [];
-clippings.push('Filhao')
-clippings.push('Bora pra cima!')
 
 const getIcon = () => {
   return process.platform === 'win32' ? 'iconTemplate@2x.ico' : 'iconTemplate.png';
@@ -43,5 +41,8 @@ const updateMenu = () => {
 }
 
 const addClipping = () => {
-  console.log('kkk')
+  const clipping = clipboard.readText();
+  clippings.push(clipping);
+  updateMenu();
+  return clipping;
 }
