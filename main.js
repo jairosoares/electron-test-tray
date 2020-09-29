@@ -1,5 +1,5 @@
 const { resolve} = require('path')
-const { app, Menu, Tray, systemPreferences, nativeTheme, clipboard, BrowserWindow, Notification } = require('electron');
+const { app, Menu, Tray, systemPreferences, nativeTheme, clipboard, BrowserWindow, Notification, dialog } = require('electron');
 const { get } = require('http');
 
 const clippings = [];
@@ -8,18 +8,18 @@ const getIcon = () => {
   return process.platform === 'win32' ? 'iconTemplate@2x.ico' : 'iconTemplate.png';
 };
 
-let tray = null
+let mainTray = {}
 app.whenReady().then(() => {
-  tray = new Tray(resolve(__dirname, 'assets', getIcon()))
+  mainTray = new Tray(resolve(__dirname, 'assets', getIcon()))
   
-  testEnvironment();
+  testEnvironment(mainTray);
 
   //Hides the dock icon if running on macOS
   if (app.dock) app.dock.hide();
-  updateMenu();
+  updateMenu(mainTray);
 })
 
-const testEnvironment = () => {
+function testEnvironment(tray = mainTray) {
   if (process.platform === 'win32') {
     tray.on('click', tray.popUpContextMenu);
   } else {
@@ -28,10 +28,11 @@ const testEnvironment = () => {
   console.log('isDarkMode ? ' + nativeTheme.shouldUseDarkColors)
 };
 
-const updateMenu = () => {
+function updateMenu(tray = mainTray) {
   const contextMenu = Menu.buildFromTemplate([
+    { label: 'Open Dialog', click() {openDialog()} },
     { label: 'View Settings', type: 'radio' },
-    { label: 'Add Clipping', click() {addClipping()}},
+    { label: 'Add Clipping', click() {addClipping(tray)}},
     { type: 'separator'},
     ...clippings.map((clipping, index) => ({label: clipping})),
     { type: 'separator'},
@@ -43,7 +44,12 @@ const updateMenu = () => {
   tray.setContextMenu(contextMenu)
 }
 
-const addClipping = () => {
+function openDialog() {
+  //Ok! Select files
+  dialog.showOpenDialog({properties: ['openFile', 'multiSelectioins']});
+}
+
+function addClipping (tray = mainTray) {
   const clipping = clipboard.readText();
   clippings.push(clipping);
 
@@ -63,6 +69,6 @@ const addClipping = () => {
     myNotification.show();
   }
 
-  updateMenu();
+  updateMenu(tray);
   return clipping;
 };

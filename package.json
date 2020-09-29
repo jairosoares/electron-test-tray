@@ -1,15 +1,32 @@
 {
   "name": "test",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:windows": "electron-builder --windows",
+    "postinstall":"electron-builder install-app-deps"
   },
-  "author": "",
+  "author": "Jegue <jeguebeer@gmail.com>",
   "license": "ISC",
+  "dependencies": {
+    
+  },
   "devDependencies": {
-    "electron": "^10.1.2"
+    "electron": "^10.1.2",
+    "electron-builder": "^22.8.1"
+  },
+  "build": {
+    "linux": {
+      "category": "Utility",
+      "icon": "icon.png",
+      "target": [
+        "AppImage"
+      ]
+    }
   }
 }
